@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Analysis</title>
+    <link href="static/css/nouislider.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="static/css/style.css" media="screen" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="static/js/nouislider.min.js"></script>
+    <script src="static/js/script.js"></script>
+</head>
+<body>
+  <div id="interactions-container">
+    <div id="dropdown-container">
+        <label for="x"> X: </label>
+        <!-- TODO: update the bar chart when the grouper is changed -->
+        <select name="x" onchange="update_aggregate(this.value, 'x')">
+            {% for x in filter_ranges %}
+                <option value="{{x}}">{{ x }}</option>
+            {% endfor %}
+        </select>
+        <label for="y"> Y: </label>
+        <!-- TODO: update the bar chart when the value is changed -->
+        <select name="y" onchange="update_aggregate(this.value, 'y')">
+            {% for y in filter_ranges %}
+                <option value="{{y}}">{{ y }}</option>
+            {% endfor %}
+        </select>
+    </div>
+  </div>
+  <div class="container">
+    <div class="scatters">
+        <div class="scatter-container">
+            <h1>Scatter Plot 1</h1>
+            <div id="scatter1"></div>
+        </div>
+        <div class="scatter-container">
+            <h1>Scatter Plot 2</h1>
+            <div id="scatter2"></div>
+        </div>
+    </div>    
+
+    <div class="sliders">
+      <h3>CGPA</h3><div id="cgpa-slider" style="width:400pt; display: inline-block"></div>
+      <h3>Internships</h3><div id="internships-slider" style="width:400pt; display: inline-block"></div>
+      <h3>Projects</h3><div id="projects-slider" style="width:400pt; display: inline-block"></div>
+      <h3>Workshops/Certifications</h3><div id="wc-slider" style="width:400pt; display: inline-block"></div>
+      <h3>AptitudeTestScore</h3><div id="ats-slider" style="width:400pt; display: inline-block"></div>
+      <h3>SoftSkillsRating</h3><div id="skr-slider" style="width:400pt; display: inline-block"></div>
+
+      <h3>Extracurricular Activities</h3>
+      {% for option in ExtracurricularActivities %}
+          <input type="radio" name="ExtracurricularActivities" value="{{ option }}" onchange="update()">
+          <label>{{ option }}</label>
+      {% endfor %}
+
+      <h3>Placement Training</h3>
+      {% for option in PlacementTraining %}
+          <input type="radio" name="PlacementTraining" value="{{ option }}" onchange="update()">
+          <label>{{ option }}</label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script>
+    margin = {top: 45, right: 30, bottom: 30, left: 45},
+    width = 460 - margin.left - margin.right,
+    height = 360 - margin.top - margin.bottom;
+
+    scatter1_svg = draw_svg('scatter1', margin, width, height);
+    scatter1_scale = draw_axes('scatter1', scatter1_svg, width, height, [0, 10], [0, 100], false);
+
+    scatter2_svg = draw_svg('scatter2', margin, width, height);
+    scatter2_scale = draw_axes('scatter2', scatter2_svg, width, height, [0, 10], [0, 100], false);
+
+    {% for column, (min,max) in filter_ranges.items() %}
+        draw_slider('{{column}}', {{min}}, {{max}}, scatter_svg, bar_svg, scatter_scale, bar_scale)
+    {% endfor %}
+
+    //need to work on this
+    update(scatter_svg, bar_svg, scatter_scale, bar_scale)
+    function update_checked(checkbox){
+        checkbox.classList.toggle('day-selected')
+        update(scatter_svg, bar_svg, scatter_scale, bar_scale)
+    }
+  </script>
+</body>
+</html>
