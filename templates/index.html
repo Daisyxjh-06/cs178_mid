@@ -42,12 +42,12 @@
     </div>    
 
     <div class="sliders">
-      <h3>CGPA</h3><div id="cgpa-slider" style="width:400pt; display: inline-block"></div>
-      <h3>Internships</h3><div id="internships-slider" style="width:400pt; display: inline-block"></div>
-      <h3>Projects</h3><div id="projects-slider" style="width:400pt; display: inline-block"></div>
-      <h3>Workshops/Certifications</h3><div id="wc-slider" style="width:400pt; display: inline-block"></div>
-      <h3>AptitudeTestScore</h3><div id="ats-slider" style="width:400pt; display: inline-block"></div>
-      <h3>SoftSkillsRating</h3><div id="skr-slider" style="width:400pt; display: inline-block"></div>
+      <h3>CGPA</h3><div id="CGPA-slider" style="width:400pt; display: inline-block"></div>
+      <h3>Internships</h3><div id="Internships-slider" style="width:400pt; display: inline-block"></div>
+      <h3>Projects</h3><div id="Projects-slider" style="width:400pt; display: inline-block"></div>
+      <h3>Workshops/Certifications</h3><div id="Workshops/Certifications-slider" style="width:400pt; display: inline-block"></div>
+      <h3>AptitudeTestScore</h3><div id="AptitudeTestScore-slider" style="width:400pt; display: inline-block"></div>
+      <h3>SoftSkillsRating</h3><div id="SoftSkillsRating-slider" style="width:400pt; display: inline-block"></div>
 
       <h3>Extracurricular Activities</h3>
       {% for option in ExtracurricularActivities %}
@@ -75,7 +75,11 @@
     scatter2_scale = draw_axes('scatter2', scatter2_svg, width, height, [0, 10], [0, 100], false);
 
     {% for column, (min,max) in filter_ranges.items() %}
-        draw_slider('{{column}}', {{min}}, {{max}}, scatter_svg, bar_svg, scatter_scale, bar_scale)
+        console.log('{{column}}')
+        console.log({{min}})
+        console.log({{max}})
+        console.log('ends here')
+        draw_slider('{{column}}', {{min}}, {{max}})
     {% endfor %}
 
     //need to work on this

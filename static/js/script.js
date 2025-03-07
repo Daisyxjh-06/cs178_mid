@@ -27,9 +27,9 @@ function draw_slider(column, min, max, scatter_svg, scatter2_svg, scatter_scale,
       step: 1,
       range: {'min': min, 'max': max}
     });
-    slider.noUiSlider.on('change', function(){
-        update(scatter_svg, scatter2_svg, scatter_scale, scatter2_scale)
-    });
+    // slider.noUiSlider.on('change', function(){
+    //     update(scatter_svg, scatter2_svg, scatter_scale, scatter2_scale)
+    // });
 }
 
 // extracts the selected days and minimum/maximum values for each slider
