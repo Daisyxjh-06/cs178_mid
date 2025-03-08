@@ -11,10 +11,8 @@ PlacementStatus = ['Placed', 'Not Placed']
 
 @app.route('/')
 def index():
-    # Ensure correct path for DuckDB CSV
     CSV_PATH = os.path.join(os.getcwd(), './placementdata.csv')
 
-    # SQL Query to get filter ranges
     filter_ranges_query = f'''
     SELECT 
         MIN(CGPA) AS min_CGPA, MIN(Internships) AS min_Internships, MIN(Projects) AS min_Projects, 
@@ -25,11 +23,9 @@ def index():
         MAX(SSC_Marks) AS max_SSC, MAX(HSC_Marks) AS max_HSC
     FROM '{CSV_PATH}'
     '''
-    
-    # Execute Query and Handle Missing Values
+
     filter_ranges_results = duckdb.sql(filter_ranges_query).df().fillna(0)
 
-    # Store filter values
     filter_ranges = {
         "CGPA": (filter_ranges_results["min_CGPA"][0], filter_ranges_results["max_CGPA"][0]),
         "Internships": (filter_ranges_results["min_Internships"][0], filter_ranges_results["max_Internships"][0]),
@@ -41,38 +37,79 @@ def index():
         "HSC_Marks": (filter_ranges_results["min_HSC"][0], filter_ranges_results["max_HSC"][0])
     }
 
+    placement_count_query = '''
+    SELECT PlacementStatus, COUNT(*) AS placement_count 
+    FROM placementdata.csv 
+    GROUP BY PlacementStatus 
+    ORDER BY placement_count DESC
+    '''
+    
+    placement_count_results = duckdb.sql(placement_count_query).df()
+    max_placement_count = placement_count_results['placement_count'].max() if not placement_count_results.empty else 100
+
     return render_template(
         'index.html', 
         ExtracurricularActivities=ExtracurricularActivities, 
         PlacementTraining=PlacementTraining,
         PlacementStatus=PlacementStatus,
-        filter_ranges=filter_ranges
+        filter_ranges=filter_ranges,
+        placement_count=max_placement_count
     )
 
 @app.route('/update', methods=["POST"])
 def update():
     request_data = request.get_json()
-    print("Received Data:", request_data)  # Debugging
 
-    # Dummy scatter plot data (replace with filtering logic)
-    scatter_data = [
-        {"X": 7.5, "Y": 65},
-        {"X": 8.9, "Y": 90},
-        {"X": 7.3, "Y": 82},
-        {"X": 7.5, "Y": 85},
-        {"X": 8.3, "Y": 86},
-        {"X": 7.0, "Y": 71},
-        {"X": 7.7, "Y": 76}
-    ]
-    
+    CSV_PATH = os.path.join(os.getcwd(), './placementdata.csv')
+
+    # Filtering query based on user input
+    filter_query = f'''
+    SELECT CGPA, Internships, Projects, "Workshops/Certifications", 
+           AptitudeTestScore, SoftSkillsRating, SSC_Marks, HSC_Marks, PlacementStatus
+    FROM '{CSV_PATH}'
+    WHERE CGPA BETWEEN {request_data['cgpa'][0]} AND {request_data['cgpa'][1]}
+    AND Internships BETWEEN {request_data['internships'][0]} AND {request_data['internships'][1]}
+    AND Projects BETWEEN {request_data['projects'][0]} AND {request_data['projects'][1]}
+    AND "Workshops/Certifications" BETWEEN {request_data['wc'][0]} AND {request_data['wc'][1]}
+    AND AptitudeTestScore BETWEEN {request_data['ats'][0]} AND {request_data['ats'][1]}
+    AND SoftSkillsRating BETWEEN {request_data['ssr'][0]} AND {request_data['ssr'][1]}
+    AND SSC_Marks BETWEEN {request_data['ssc'][0]} AND {request_data['ssc'][1]}
+    AND HSC_Marks BETWEEN {request_data['hsc'][0]} AND {request_data['hsc'][1]}
+    '''
+
+    filtered_data = duckdb.sql(filter_query).df()
+
+    # default对比就是cgpa和ats，需要完成update_aggregate()
+    scatter_data = filtered_data[['CGPA', 'AptitudeTestScore']].rename(columns={'CGPA': 'X', 'AptitudeTestScore': 'Y'}).to_dict(orient='records')
+
+    bar_query = f'''
+    SELECT PlacementStatus, COUNT(*) AS count 
+    FROM '{CSV_PATH}' 
+    WHERE PlacementStatus IN ('Placed', 'NotPlaced')
+    GROUP BY PlacementStatus
+    '''
+    bar_data_df = duckdb.sql(bar_query).df()
+
+    # Extract individual counts for each placement status
+    if not bar_data_df.empty:
+        # Create a dictionary mapping each status to its count
+        counts = {row['PlacementStatus']: row['count'] for index, row in bar_data_df.iterrows()}
+        placed_count = counts.get('Placed', 0)
+        not_placed_count = counts.get('NotPlaced', 0)
+    else:
+        placed_count = 0
+        not_placed_count = 0
+
+    # Prepare bar chart data (renaming fields to X and Y for your front-end)
     bar_data = [
-        { "X": "Yes", "Y": 50 },
-        { "X": "No", "Y": 40 },
+        {'X': 'Placed', 'Y': placed_count},
+        {'X': 'Not Placed', 'Y': not_placed_count}
     ]
 
+    # print(bar_data)
     return jsonify({
         "scatter1_data": scatter_data,
-        "bar_data": bar_data  
+        "bar_data": bar_data
     })
 
 if __name__ == "__main__":

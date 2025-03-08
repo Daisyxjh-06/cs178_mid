@@ -1,75 +1,143 @@
-/* General Styling */
+/* 重置默认样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Arial', sans-serif;
-    font-size: 12px;
     background-color: #f9f9f9;
     color: #333;
-    margin: 0;
-    padding: 20px;
+    line-height: 1.6;
 }
 
-/* Styling for text */
-text {
-    font-family: 'Arial', sans-serif;
-    font-size: 12px;
+/* 头部样式 */
+header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
 }
 
-/* Center Container */
-.container {
+/* 整体布局：侧边栏 + 主要内容 */
+.layout-container {
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 40px;
-    padding: 20px;
-}
-
-/* Scatter Plots Side by Side */
-.scatters {
-    display: flex;
-    justify-content: center;
-    /* Centers the scatter plots */
-    gap: 40px;
-    /* Adds spacing between the two plots */
-    padding: 20px;
     flex-wrap: wrap;
-    /* Ensures responsiveness */
+    margin: 20px;
 }
 
-/* Styling for each scatter plot */
-.scatter-container {
-    width: 45%;
-    /* Makes sure each takes almost half the space */
-    min-width: 300px;
-    /* Ensures it doesn't shrink too much */
-    text-align: center;
+/* 侧边栏 */
+.sidebar {
+    flex: 1 1 300px;
+    max-width: 300px;
+    background-color: #fff;
+    padding: 20px;
+    border-right: 2px solid #007bff;
 }
 
-/* Graph Titles */
-h1 {
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
+/* 主要内容 */
+.main-content {
+    flex: 3 1 600px;
+    padding: 20px;
+}
+
+/* Sidebar 内部的区域分隔 */
+.sidebar section {
+    margin-bottom: 20px;
+}
+
+.sidebar h2 {
+    font-size: 18px;
     margin-bottom: 10px;
+    border-bottom: 1px solid #007bff;
+    padding-bottom: 5px;
 }
 
-/* Sliders */
-.slider-container {
+/* 下拉菜单 */
+.dropdowns {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 10px;
-    width: 200px;
+    gap: 10px;
 }
 
-.slider-container h3 {
-    font-size: 12px;
+.dropdowns label {
+    font-weight: bold;
+}
+
+/* 滑块 */
+.slider {
+    margin-bottom: 15px;
+}
+
+.slider label {
+    display: block;
+    margin-bottom: 40px;
+    font-weight: bold;
+}
+
+/* 单选项组 */
+.radio-group {
+    margin-bottom: 15px;
+}
+
+.radio-group p {
+    font-weight: bold;
     margin-bottom: 5px;
 }
 
+.radio-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
+/* 图表区域 */
+.charts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.chart-container {
+    flex: 1 1 300px;
+    background-color: #fff;
+    padding: 20px;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.chart-container h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+/* D3 图表坐标轴样式 */
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #333;
+    shape-rendering: crispEdges;
+}
+
+/* Tooltip 样式 */
+.tooltip {
+    position: absolute;
+    font-size: 12px;
+    background-color: #fff;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    padding: 6px;
+    pointer-events: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* NoUiSlider 默认样式调整 */
 .noUi-target {
     background: #e0e0e0;
     border-radius: 5px;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 .noUi-connect {
@@ -79,7 +147,6 @@ h1 {
 .noUi-handle {
     border: none;
     background: #007bff;
-    box-shadow: none;
     cursor: pointer;
 }
 
@@ -88,60 +155,26 @@ h1 {
     background: #fff;
     border-radius: 3px;
     padding: 5px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Axis */
-.axis {
-    font: 12px sans-serif;
-}
-
-.axis path,
-.axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
-}
-
-/* Tooltip Styling */
-.tooltip {
-    position: absolute;
-    font-size: 12px;
-    width: auto;
-    height: auto;
-    pointer-events: none;
-    background-color: white;
-    border-radius: 4px;
-    padding: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-/* Radio Buttons */
-.radio-container {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.radio-container label {
-    font-size: 12px;
-    cursor: pointer;
-}
-
-input[type="radio"] {
-    accent-color: #007bff;
-    cursor: pointer;
-}
-
-/* Responsive Design */
+/* 响应式调整 */
 @media (max-width: 768px) {
-    .container {
+    .layout-container {
         flex-direction: column;
-        align-items: center;
-        gap: 20px;
     }
 
-    .graph-container {
-        flex-direction: column;
+    .sidebar {
+        border-right: none;
+        border-bottom: 2px solid #007bff;
+        max-width: none;
+    }
+
+    .main-content {
+        padding: 10px;
+    }
+
+    .chart-container {
+        margin-bottom: 20px;
     }
 }
