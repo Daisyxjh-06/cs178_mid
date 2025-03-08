@@ -9,7 +9,16 @@ function draw_svg(container_id, margin, width, height) {
 }
 
 function draw_axes(plot_name, svg, width, height, domainx, domainy, x_discrete) {
-    var x_scale = d3.scaleLinear().domain(domainx).range([0, width]);
+    // var x_scale = d3.scaleLinear().domain(domainx).range([0, width]);
+    var x_scale = x_discrete 
+    ? d3.scaleBand()
+        .domain(domainx)
+        .range([0, width])
+        .padding(0.1)  
+    : d3.scaleLinear()
+        .domain(domainx)
+        .range([0, width]);
+
     var y_scale = d3.scaleLinear().domain(domainy).range([height, 0]);
 
     svg.append("g").attr("class", plot_name + "-xaxis").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x_scale));
@@ -18,7 +27,7 @@ function draw_axes(plot_name, svg, width, height, domainx, domainy, x_discrete) 
     return { 'x': x_scale, 'y': y_scale };
 }
 
-function draw_slider(column, min, max, scatter_svg, scatter2_svg, scatter_scale, scatter2_scale){
+function draw_slider(column, min, max, scatter_svg, bar_svg, scatter_scale, bar_scale){
     slider = document.getElementById(column+'-slider')
     noUiSlider.create(slider, {
       start: [min, max],
@@ -28,7 +37,7 @@ function draw_slider(column, min, max, scatter_svg, scatter2_svg, scatter_scale,
       range: {'min': min, 'max': max}
     });
     // slider.noUiSlider.on('change', function(){
-    //     update(scatter_svg, scatter2_svg, scatter_scale, scatter2_scale)
+    //     update(scatter_svg, bar_svg, scatter_scale, bar_scale)
     // });
 }
 
@@ -93,6 +102,21 @@ function draw_scatter(data, svg, scale) {
         .style("stroke", "black");
 }
 
+function draw_bar(data, svg, scale) {
+    svg.selectAll("rect").remove();
+
+    svg.selectAll("rect")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("x", d => scale.x(d.X))
+        .attr("y", d => scale.y(d.Y))
+        .attr("width", scale.x.bandwidth())
+        .attr("height", d => scale.y(0) - scale.y(d.Y))
+        .style("fill", "darkred")
+        .style("stroke", "black");
+}
+
 function update() {
     fetch('/update', {
         method: 'POST',
@@ -102,7 +126,7 @@ function update() {
     .then(response => response.json())
     .then(data => {
         draw_scatter(data['scatter1_data'], scatter1_svg, scatter1_scale);
-        draw_scatter(data['scatter2_data'], scatter2_svg, scatter2_scale);
+        draw_bar(data['bar_data'], bar_svg, bar_scale);
     })
     .catch(error => console.error("Error:", error));
 }

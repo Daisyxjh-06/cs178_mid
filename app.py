@@ -58,10 +58,15 @@ def update():
         {"X": 7.0, "Y": 71},
         {"X": 7.7, "Y": 76}
     ]
+    
+    bar_data = [
+        { "X": "Yes", "Y": 50 },
+        { "X": "No", "Y": 40 },
+    ]
 
     return jsonify({
         "scatter1_data": scatter_data,
-        "scatter2_data": scatter_data  # Identical for now
+        "bar_data": bar_data  
     })
 
 if __name__ == "__main__":

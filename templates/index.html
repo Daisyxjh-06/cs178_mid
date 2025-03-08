@@ -32,12 +32,12 @@
   <div class="container">
     <div class="scatters">
         <div class="scatter-container">
-            <h1>Scatter Plot 1</h1>
+            <h1>Scatter Plot</h1>
             <div id="scatter1"></div>
         </div>
-        <div class="scatter-container">
-            <h1>Scatter Plot 2</h1>
-            <div id="scatter2"></div>
+        <div class="bar-container">
+            <h1>Bar Chart </h1>
+            <div id="bar"></div>
         </div>
     </div>    
 
@@ -71,8 +71,9 @@
     scatter1_svg = draw_svg('scatter1', margin, width, height);
     scatter1_scale = draw_axes('scatter1', scatter1_svg, width, height, [0, 10], [0, 100], false);
 
-    scatter2_svg = draw_svg('scatter2', margin, width, height);
-    scatter2_scale = draw_axes('scatter2', scatter2_svg, width, height, [0, 10], [0, 100], false);
+    const barCategories = ['Yes', 'No'];
+    bar_svg = draw_svg('bar', margin, width, height);
+    bar_scale = draw_axes('bar', bar_svg, width, height, barCategories, [0, 100], true);
 
     {% for column, (min,max) in filter_ranges.items() %}
         console.log('{{column}}')
