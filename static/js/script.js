@@ -58,7 +58,10 @@ function get_params(){
     document.querySelectorAll('#PlacementTraining').forEach(function(radio){
         pt.push(radio.value);
     });
-
+    document.querySelectorAll('#PlacementStatus').forEach(function(radio){
+        pt.push(radio.value);
+    });
+    
     var cgpaSlider = document.getElementById('cgpa-slider');
     if (cgpaSlider && cgpaSlider.noUiSlider) {
         cgpa = cgpaSlider.noUiSlider.get().map(Number);
@@ -83,9 +86,17 @@ function get_params(){
     if (ssrSlider && ssrSlider.noUiSlider) {
         ssr = ssrSlider.noUiSlider.get().map(Number);
     }
+    var sscSlider = document.getElementById('SSC_Marks-slider');
+    if (sscSlider && sscSlider.noUiSlider) {
+        ssc = sscSlider.noUiSlider.get().map(Number);
+    }
+    var hscSlider = document.getElementById('HSC_Marks-slider');
+    if (hscSlider && hscSlider.noUiSlider) {
+        hsc = hscSlider.noUiSlider.get().map(Number);
+    }
 
     return {'ea': ea, 'pt': pt, 'cgpa': cgpa, 'internships': internships, 
-        'projects': projects, 'wc': wc, 'ats': ats, 'ssr': ssr}
+        'projects': projects, 'wc': wc, 'ats': ats, 'ssr': ssr, 'ssc': ssc, 'hsc': hsc};
 }
 
 function draw_scatter(data, svg, scale) {
