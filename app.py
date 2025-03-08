@@ -22,7 +22,7 @@ def index():
         MIN(SSC_Marks) AS min_SSC, MIN(HSC_Marks) AS min_HSC,
         MAX(CGPA) AS max_CGPA, MAX(Internships) AS max_Internships, MAX(Projects) AS max_Projects, 
         MAX("Workshops/Certifications") AS max_WC, MAX(AptitudeTestScore) AS max_ATS, MAX(SoftSkillsRating) AS max_SSR,
-        MAX(SSC_Marks) AS max_SSC, MAX(HSC_Marks) AS max_H
+        MAX(SSC_Marks) AS max_SSC, MAX(HSC_Marks) AS max_HSC
     FROM '{CSV_PATH}'
     '''
     
