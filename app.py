@@ -60,6 +60,8 @@ def index():
 def update():
     request_data = request.get_json()
 
+    x_column = request_data.get('x', 'CGPA')  # 默认 X 轴变量
+    y_column = request_data.get('y', 'AptitudeTestScore')  # 默认 Y 轴变量
     CSV_PATH = os.path.join(os.getcwd(), './placementdata.csv')
 
     # Filtering query based on user input
@@ -79,13 +81,33 @@ def update():
 
     filtered_data = duckdb.sql(filter_query).df()
 
-    # default对比就是cgpa和ats，需要完成update_aggregate()
-    scatter_data = filtered_data[['CGPA', 'AptitudeTestScore']].rename(columns={'CGPA': 'X', 'AptitudeTestScore': 'Y'}).to_dict(orient='records')
+    x_min = filtered_data[x_column].min() if not filtered_data.empty else 0
+    x_max = filtered_data[x_column].max() if not filtered_data.empty else 10
+    y_min = filtered_data[y_column].min() if not filtered_data.empty else 0
+    y_max = filtered_data[y_column].max() if not filtered_data.empty else 100
 
+    # default对比就是cgpa和ats，需要完成update_aggregate()
+    # scatter_data = filtered_data[['CGPA', 'AptitudeTestScore']].rename(columns={'CGPA': 'X', 'AptitudeTestScore': 'Y'}).to_dict(orient='records')
+    scatter_data = filtered_data[[x_column, y_column]].rename(columns={x_column: 'X', y_column: 'Y'}).to_dict(orient='records')
+
+    # bar_query = f'''
+    # SELECT PlacementStatus, COUNT(*) AS count 
+    # FROM '{CSV_PATH}' 
+    # WHERE PlacementStatus IN ('Placed', 'NotPlaced')
+    # GROUP BY PlacementStatus
+    # '''
+    # **更新 Bar Chart 数据（加入过滤条件）**
     bar_query = f'''
     SELECT PlacementStatus, COUNT(*) AS count 
-    FROM '{CSV_PATH}' 
-    WHERE PlacementStatus IN ('Placed', 'NotPlaced')
+    FROM '{CSV_PATH}'
+    WHERE CGPA BETWEEN {request_data['cgpa'][0]} AND {request_data['cgpa'][1]}
+    AND Internships BETWEEN {request_data['internships'][0]} AND {request_data['internships'][1]}
+    AND Projects BETWEEN {request_data['projects'][0]} AND {request_data['projects'][1]}
+    AND "Workshops/Certifications" BETWEEN {request_data['wc'][0]} AND {request_data['wc'][1]}
+    AND AptitudeTestScore BETWEEN {request_data['ats'][0]} AND {request_data['ats'][1]}
+    AND SoftSkillsRating BETWEEN {request_data['ssr'][0]} AND {request_data['ssr'][1]}
+    AND SSC_Marks BETWEEN {request_data['ssc'][0]} AND {request_data['ssc'][1]}
+    AND HSC_Marks BETWEEN {request_data['hsc'][0]} AND {request_data['hsc'][1]}
     GROUP BY PlacementStatus
     '''
     bar_data_df = duckdb.sql(bar_query).df()
@@ -109,7 +131,9 @@ def update():
     # print(bar_data)
     return jsonify({
         "scatter1_data": scatter_data,
-        "bar_data": bar_data
+        "bar_data": bar_data,
+        "scatter_x_range": [x_min, x_max], 
+        "scatter_y_range": [y_min, y_max]
     })
 
 if __name__ == "__main__":

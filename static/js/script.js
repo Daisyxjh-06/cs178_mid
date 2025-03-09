@@ -43,6 +43,8 @@ function draw_slider(column, min, max, scatter_svg, bar_svg, scatter_scale, bar_
 
 // extracts the selected days and minimum/maximum values for each slider
 function get_params(){
+  var x = document.getElementById("x").value;  // 读取 X 轴变量
+  var y = document.getElementById("y").value;  // 读取 Y 轴变量
   var ea = [];
   var pt = [];
   var cgpa = [0, 0]
@@ -99,7 +101,7 @@ function get_params(){
       hsc = hscSlider.noUiSlider.get().map(Number);
   }
 
-  return {'ea': ea, 'pt': pt, 'cgpa': cgpa, 'internships': internships, 
+  return {'x':x, 'y':y, 'ea': ea, 'pt': pt, 'cgpa': cgpa, 'internships': internships, 
       'projects': projects, 'wc': wc, 'ats': ats, 'ssr': ssr, 'ssc': ssc, 'hsc': hsc};
 }
 
@@ -136,7 +138,6 @@ function update_scatter(data, svg, scale){
 }
 
 function update_bar(data, svg, scale) {
-  svg.selectAll("g").remove();
   svg.selectAll("rect").remove();
 
   const yMax = d3.max(data, d => d.Y);
