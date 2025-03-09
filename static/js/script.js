@@ -106,7 +106,7 @@ function get_params(){
 }
 
 function draw_scatter(data, svg, scale) {
-  svg.selectAll("dot")
+  svg.selectAll("circle")
       .data(data)
       .enter()
       .append("circle")
@@ -131,21 +131,46 @@ function draw_bar(data, svg, scale) {
 }
 
 // removes the old data points and redraws the scatterplot
-function update_scatter(data, svg, scale){
+
+function update_scatter(data, svg, scale, x_range, y_range) {
+  // update scatter X/Y scale
+  scale.x.domain(x_range);
+  scale.y.domain(y_range);
+
+  // replot X axis
+  svg.select(".scatter-xaxis").remove();
+  svg.append("g")
+      .attr("class", "scatter-xaxis")
+      .attr("transform", `translate(0, ${height})`)
+      .call(d3.axisBottom(scale.x));
+
+  // replot Y axis**
+  svg.select(".scatter-yaxis").remove();
+  svg.append("g")
+      .attr("class", "scatter-yaxis")
+      .call(d3.axisLeft(scale.y));
+
+  // remove scatter plot and redraw
   svg.selectAll("circle").remove();
-  
   draw_scatter(data, svg, scale);
 }
+
 
 function update_bar(data, svg, scale) {
   svg.selectAll("rect").remove();
 
+  // calculate the maximum Y value
   const yMax = d3.max(data, d => d.Y);
   scale.y.domain([0, yMax]);
 
+  // remove old axis and add new axis
+  svg.select(".bar-yaxis").remove();
+  svg.append("g")
+      .attr("class", "bar-yaxis")
+      .call(d3.axisLeft(scale.y));
+
   draw_bar(data, svg, scale);
 }
-
 
 function update() {
   params = get_params()
@@ -160,7 +185,8 @@ function update() {
       })
   }).then(async function(response){
       var results = JSON.parse(JSON.stringify(await response.json()));
-      update_scatter(results['scatter1_data'], scatter1_svg, scatter1_scale);
+      update_scatter(results['scatter1_data'], scatter1_svg, scatter1_scale,results['scatter_x_range'], results['scatter_y_range']);
       update_bar(results['bar_data'], bar_svg, bar_scale);  // Now correctly passing placement_count
+
   });
 }

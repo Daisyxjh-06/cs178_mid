@@ -81,14 +81,23 @@ def update():
 
     filtered_data = duckdb.sql(filter_query).df()
 
-    x_min = filtered_data[x_column].min() if not filtered_data.empty else 0
-    x_max = filtered_data[x_column].max() if not filtered_data.empty else 10
-    y_min = filtered_data[y_column].min() if not filtered_data.empty else 0
-    y_max = filtered_data[y_column].max() if not filtered_data.empty else 100
+    x_min = filtered_data[x_column].min() 
+    x_max = filtered_data[x_column].max() 
+    y_min = filtered_data[y_column].min() 
+    y_max = filtered_data[y_column].max()
+
 
     # default对比就是cgpa和ats，需要完成update_aggregate()
-    # scatter_data = filtered_data[['CGPA', 'AptitudeTestScore']].rename(columns={'CGPA': 'X', 'AptitudeTestScore': 'Y'}).to_dict(orient='records')
-    scatter_data = filtered_data[[x_column, y_column]].rename(columns={x_column: 'X', y_column: 'Y'}).to_dict(orient='records')
+    #scatter_data = filtered_data[['CGPA', 'AptitudeTestScore']].rename(columns={'CGPA': 'X', 'AptitudeTestScore': 'Y'}).to_dict(orient='records')
+    # scatter_data = filtered_data[[x_column, y_column]].rename(columns={x_column: 'X', y_column: 'Y'}).to_dict(orient='records')
+    scatter_df = filtered_data[[x_column, y_column]].copy()
+    # 如果两列名相同，则需要特殊处理
+    if x_column == y_column:
+        scatter_df.columns = ['X', 'Y']  # 强制改名
+    else:
+        scatter_df.rename(columns={x_column: 'X', y_column: 'Y'}, inplace=True)
+
+    scatter_data = scatter_df.to_dict(orient='records')
 
     # bar_query = f'''
     # SELECT PlacementStatus, COUNT(*) AS count 

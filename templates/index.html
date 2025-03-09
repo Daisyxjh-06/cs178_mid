@@ -22,13 +22,13 @@
         <h2>Filters</h2>
         <div class="dropdowns">
           <label for="x">X:</label>
-          <select name="x" id="x" onchange="update(this.value, 'x')">
+          <select name="x" id="x" onchange="update()">
             {% for x in filter_ranges %}
               <option value="{{ x }}">{{ x }}</option>
             {% endfor %}
           </select>
           <label for="y">Y:</label>
-          <select name="y" id="y" onchange="update(this.value, 'y')">
+          <select name="y" id="y" onchange="update()">
             {% for y in filter_ranges %}
               <option value="{{ y }}">{{ y }}</option>
             {% endfor %}
@@ -109,29 +109,37 @@
       </div>
     </main>
   </div>
-
   <script>
     const margin = { top: 45, right: 30, bottom: 30, left: 45 };
     const width = 460 - margin.left - margin.right;
     const height = 360 - margin.top - margin.bottom;
-
-    //这里需要更改input的range，目前是dummy给跑代码的，需要更改，scatter和bar都需要更改，目前filter_ranges被存成字典，所以需要注意，因为字典没有办法slice
+  
+    // **use `CGPA` and `AptitudeTestScore` as inital X/Y axis scope**
+    const default_x_range = {{ filter_ranges["CGPA"] | safe }};
+    const default_y_range = {{ filter_ranges["CGPA"] | safe }};
+  
+    // **initialize scatter plot**
     const scatter1_svg = draw_svg('scatter1', margin, width, height);
-    const scatter1_scale = draw_axes('scatter1', scatter1_svg, width, height, [0,100], [0,100], false);
-
+    let scatter1_scale = draw_axes('scatter1', scatter1_svg, width, height, default_x_range, default_y_range, false);
+  
+    // **initialize bar chart**
     const barCategories = ['Placed', 'Not Placed'];
     const bar_svg = draw_svg('bar', margin, width, height);
     const bar_scale = draw_axes('bar', bar_svg, width, height, barCategories, [0, 100], true);
-
+  
+    // **initial all sliders**
     {% for column, (min, max) in filter_ranges.items() %}
       draw_slider('{{ column }}', {{ min }}, {{ max }});
     {% endfor %}
-    update(scatter1_svg, bar_svg, scatter1_scale, bar_scale);
-
+  
+    // ** update() to retrieve data and scatter plot**
+    update();
+  
     function update_checked(checkbox) {
       checkbox.classList.toggle('day-selected');
-      update(scatter1_svg, bar_svg, scatter1_scale, bar_scale);
+      update();
     }
   </script>
+  
 </body>
 </html>
